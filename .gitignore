@@ -1,0 +1,16 @@
+# Ignorer le dossier node_modules (dépendances)
+node_modules/
+
+# Ignorer les fichiers de compilation TypeScript
+dist/
+*.js
+*.js.map
+
+# Ignorer les fichiers de logs et d'environnement
+npm-debug.log
+yarn-error.log
+.env
+
+# Ignorer le contenu du dossier data/ mais garder le dossier
+data/*
+!data/.gitkeep
