@@ -18,6 +18,8 @@
   "dependencies": {
     "cheerio": "^1.0.0",
     "chromadb": "^1.10.3",
+    "dotenv": "^16.4.7",
+    "node-fetch": "^3.3.2",
     "pdf-parse": "^1.1.1"
   }
 }
