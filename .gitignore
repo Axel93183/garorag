@@ -3,8 +3,6 @@ node_modules/
 
 # Ignorer les fichiers de compilation TypeScript
 dist/
-*.js
-*.js.map
 
 # Ignorer les fichiers de logs et d'environnement
 npm-debug.log

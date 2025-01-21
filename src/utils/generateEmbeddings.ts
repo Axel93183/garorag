@@ -1,29 +1,51 @@
 require("dotenv").config(); // 🔥 Charge les variables d’environnement depuis `.env`
+import { config } from "../config";
 
-const HUGGINGFACE_API_KEY = process.env.HUGGINGFACE_API_KEY; // 🔥 Récupère la clé API depuis `.env`
+export async function getEmbedding(
+  text: string,
+): Promise<number[] | undefined> {
+  console.log(`🚀 Début de la génération d'embeddings pour : "${text}"`);
+  let MODEL_URL = config.huggingFace.modelUrl; // ✅ Par défaut, Hugging Face
+  let API_KEY = config.huggingFace.apiKey;
+  console.log("🔍 Clé API Hugging Face :", process.env.HUGGINGFACE_API_KEY);
+  console.log("🔍 Clé API depuis config :", config.huggingFace.apiKey);
 
-const MODEL_URL =
-  "https://api-inference.huggingface.co/pipeline/feature-extraction/sentence-transformers/all-MiniLM-L6-v2";
+  let requestBody: any;
 
-async function getEmbedding(text: string): Promise<number[] | undefined> {
-  if (!HUGGINGFACE_API_KEY) {
-    console.error("❌ Erreur : Clé API Hugging Face non définie !");
+  if (config.embeddingProvider === "openai") {
+    console.log("🚀 Utilisation d'OpenAI pour les embeddings");
+    MODEL_URL = config.openAI.modelUrl;
+    API_KEY = config.openAI.apiKey;
+    requestBody = { model: "text-embedding-ada-002", input: text }; // 🔥 Modèle OpenAI
+  } else if (config.embeddingProvider === "google") {
+    console.log("🚀 Utilisation de Google Generative AI pour les embeddings");
+    MODEL_URL = config.googleAI.modelUrl;
+    API_KEY = config.googleAI.apiKey;
+    requestBody = { content: text }; // 🔥 Format attendu par Google
+  } else {
+    console.log("🚀 Utilisation de Hugging Face pour les embeddings");
+    requestBody = { inputs: text }; // 🔥 Format Hugging Face
+  }
+
+  if (!API_KEY) {
+    console.error(
+      `❌ Erreur : Clé API manquante pour ${config.embeddingProvider}`,
+    );
     return;
   }
 
   const response = await fetch(MODEL_URL, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${HUGGINGFACE_API_KEY}`,
+      Authorization: `Bearer ${API_KEY}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ inputs: text }), // ✅ Envoi correct du texte
+    body: JSON.stringify(requestBody),
   });
 
   const data = await response.json();
-  console.log("🔍 Réponse API Hugging Face :", JSON.stringify(data, null, 2));
+  console.log("🔍 Réponse API :", JSON.stringify(data, null, 2));
 
-  // ✅ Correction : Vérifier si la réponse est bien un tableau d'embeddings
   if (!Array.isArray(data)) {
     console.error("❌ Erreur : Format de réponse inattendu !");
     return;
@@ -33,10 +55,10 @@ async function getEmbedding(text: string): Promise<number[] | undefined> {
 }
 
 // Exemple de test avec du texte extrait du PDF
-async function testEmbeddings() {
-  const text = "Exemple de texte extrait d'un PDF"; // Remplace par du vrai texte extrait
-  const embedding = await getEmbedding(text);
-  console.log("✅ Embedding généré :", embedding);
-}
+// async function testEmbeddings() {
+//   const text = "Exemple de texte extrait d'un PDF"; // Remplace par du vrai texte extrait
+//   const embedding = await getEmbedding(text);
+//   console.log("✅ Embedding généré :", embedding);
+// }
 
-testEmbeddings();
+// testEmbeddings();

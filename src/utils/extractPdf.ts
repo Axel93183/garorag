@@ -4,7 +4,7 @@ import { config } from "../config"; // 🔥 Import depuis config.ts
 
 const pdfDirectory = path.resolve(process.cwd(), config.pdfDirectory);
 
-async function extractTextFromPDF(pdfPath: string): Promise<string> {
+export async function extractTextFromPDF(pdfPath: string): Promise<string> {
   console.log("📜 Lecture du fichier :", pdfPath);
 
   if (!fs.existsSync(pdfPath)) {
